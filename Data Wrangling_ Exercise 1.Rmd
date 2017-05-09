@@ -1,0 +1,97 @@
+---
+title: 'Data Wrangling Exercise 1: Basic Data Manipulation'
+author: "Trudy Fuher"
+date: "May 7, 2017"
+output: html_document
+---
+
+## Load the Data in RStudio
+**TASK**: Save the data set as a CSV file called refine_original.csv and load it in RStudio into a data frame.
+
+I loaded the data in RStudio using this code and then created a data frame. 
+
+```{r}
+library(readr)
+library(dplyr)
+library(tidyr)
+
+refine_original <- read_csv("C:/Users/twalter/Box Sync/twalter/2017 Projects/Foundations of Data Science/Data Wrangling/refine_original.csv")
+
+ro_df <- refine_original 
+
+tbl_df(ro_df)
+View (ro_df)
+
+```
+
+## Clean up the brand names  
+**TASK**: Clean up the 'company' column so all of the misspellings of the brand names are standardized. For example, you can transform the values in the column to be: philips, akzo, van houten and unilever (all lowercase)
+
+To clean up this code, I first changed everything to lowercase and then I fixed the misspelled words. 
+
+```{r}
+ro_df$company <- tolower(ro_df$company)
+
+ro_df$company <- ifelse(ro_df$company %in% c("phillips", "philips", "phllips", "phillps", "fillips", "phlips"), "philips", ro_df$company)
+ro_df$company <- ifelse(ro_df$company %in% c("akz0", "ak zo"), "azko", ro_df$company)
+ro_df$company <- ifelse(ro_df$company %in% c("van houten"), "van houten", ro_df$company)
+ro_df$company <- ifelse(ro_df$company %in% c("unilver", "unilever"), "unilever", ro_df$company)
+
+View (ro_df)
+```
+
+
+## Separate product code and number  
+**TASK:** Separate the product code and product number into separate columns i.e. add two new columns called product_code and product_number, containing the product code and number respectively
+
+I used the seperate function to do this. 
+```{r}
+ro_df <- ro_df %>% separate (`Product code / number`, c("Product_Code", "Product_Number"), "-", extra = "merge")
+
+View (ro_df)
+ 
+```
+
+## Add product categories
+**TASK:** You learn that the product codes actually represent the following product categories:
+
+p = Smartphone
+v = TV
+x = Laptop
+q = Tablet
+
+In order to make the data more readable, add a column with the product category for each record.
+```{r}
+ro_df$Product_Category[ro_df$Product_Code == "p"] <- "Smartphone"
+ro_df$Product_Category[ro_df$Product_Code == "v"] <- "TV"
+ro_df$Product_Category[ro_df$Product_Code == "x"] <- "Laptop"
+ro_df$Product_Category[ro_df$Product_Code == "q"] <- "Tablet"
+
+View (ro_df)
+```
+
+
+
+## Add full address for geocoding
+**TASK:**You'd like to view the customer information on a map. In order to do that, the addresses need to be in a form that can be easily geocoded. Create a new column full_address that concatenates the three address fields (address, city, country), separated by commas.
+
+```{r}
+ro_df$Full_address = paste(ro_df$address, ro_df$city, ro_df$country, sep = ", ")
+View (ro_df)
+```
+
+
+## Create dummy variables for company and product category
+**TASK:**Both the company name and product category are categorical variables i.e. they take only a fixed set of values. In order to use them in further analysis you need to create dummy variables. Create dummy binary variables for each of them with the prefix company_ and product_ i.e.Add four binary (1 or 0) columns for company: company_philips, company_akzo, company_van_houten and company_unilever.Add four binary (1 or 0) columns for product category: product_smartphone, product_tv, product_laptop and product_tablet.
+
+I wasn't sure what this was task was even asking. After spending two days trying to figure this out, I gave up. 
+
+## Submit the project on Github. 
+**TASK:**Include your code, the original data as a CSV file refine_original.csv, and the cleaned up data as a CSV file called refine_clean.csv.
+
+```{r}
+
+write.csv(refine_original, "refine_original_clean.csv")
+
+```
+
